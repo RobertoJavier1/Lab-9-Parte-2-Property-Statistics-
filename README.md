@@ -6,7 +6,8 @@ Se realizó la implementación del endpoint de estadísticas `GET /api/propertie
 
 ---
 
-## Video Explicación: https://youtu.be/PXAekIWf9OY
+## Video Explicación:
+https://youtu.be/PXAekIWf9OY
 
 ---
 
