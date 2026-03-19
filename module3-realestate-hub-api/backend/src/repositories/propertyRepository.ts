@@ -233,6 +233,56 @@ export const propertyRepository = {
     });
     return property !== null;
   },
+
+  
+  //Obtiene estadísticas agregadas de las propiedades
+  async getStats(): Promise<{
+    total: number;
+    byType: Record<string, { count: number; avgPrice: number }>;
+    priceRange: { min: number; max: number };
+  }> {
+    //Conteo total
+    const total = await prisma.property.count();
+
+    //Si no hay datos retornamos zeros
+    if (total === 0) {
+      return {
+        total: 0,
+        byType: {},
+        priceRange: { min: 0, max: 0 },
+      };
+    }
+
+    //Agrupamos por tipo, count + avg price
+    const grouped = await prisma.property.groupBy({
+      by: ['propertyType'],
+      _count: { id: true },
+      _avg: { price: true },
+    });
+
+    //Rango global de precios
+    const priceAgg = await prisma.property.aggregate({
+      _min: { price: true },
+      _max: { price: true },
+    });
+
+    const byType: Record<string, { count: number; avgPrice: number }> = {};
+    for (const group of grouped) {
+      byType[group.propertyType] = {
+        count: group._count.id,
+        avgPrice: Math.round(group._avg.price ?? 0),
+      };
+    }
+
+    return {
+      total,
+      byType,
+      priceRange: {
+        min: priceAgg._min.price ?? 0,
+        max: priceAgg._max.price ?? 0,
+      },
+    };
+  },
 };
 
 // =============================================================================
