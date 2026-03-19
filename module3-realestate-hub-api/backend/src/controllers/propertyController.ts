@@ -264,3 +264,27 @@ export async function deleteProperty(req: Request, res: Response): Promise<void>
     });
   }
 }
+
+// =============================================================================
+// GET /api/properties/stats - Estadísticas de propiedades
+// =============================================================================
+
+export async function getPropertyStats(req: Request, res: Response): Promise<void> {
+  try {
+    const stats = await propertyRepository.getStats();
+
+    res.json({
+      success: true,
+      data: stats,
+    });
+  } catch (error) {
+    console.error('Error al obtener estadísticas:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        message: 'Error interno del servidor',
+        code: 'INTERNAL_ERROR',
+      },
+    });
+  }
+}
